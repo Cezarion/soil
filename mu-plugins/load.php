@@ -8,13 +8,21 @@ Author:       Ben Word
 Author URI:   http://benword.com/
 */
 
-require WPMU_PLUGIN_DIR . '/options-framework-plugin/options-framework.php';
+require WPMU_PLUGIN_DIR . '/root-relative-urls/sb_root_relative_urls.php';
+
+//require WPMU_PLUGIN_DIR . '/options-framework-plugin/options-framework.php';
 require WPMU_PLUGIN_DIR . '/wp-post-formats/cf-post-formats.php';
+
+//Attachements tools
+require WPMU_PLUGIN_DIR . '/regenerate-thumbnails/regenerate-thumbnails.php';
+require WPMU_PLUGIN_DIR . '/enable-media-replace/enable-media-replace.php';
+
 
 // Site specific custom post types, taxonomies, meta boxes and shortcodes
 require WPMU_PLUGIN_DIR . '/base/base.php';
 
 // Load CMB
+/*
 function load_cmb() {
   if (!is_admin()) {
     return;
@@ -23,3 +31,4 @@ function load_cmb() {
   require WPMU_PLUGIN_DIR . '/cmb/init.php';
 }
 add_action('init', 'load_cmb');
+*/

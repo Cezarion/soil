@@ -43,7 +43,7 @@ function base_register_rotator_post_type() {
 
   register_post_type('base_rotator', $args);
 }
-add_action('init', 'base_register_rotator_post_type');
+//add_action('init', 'base_register_rotator_post_type');
 
 /**
  * Rotator Location taxonomy
@@ -72,4 +72,36 @@ function base_register_location_taxonomy() {
   );
   register_taxonomy('base_rotator_location', 'base_rotator', $args);
 }
-add_action('init', 'base_register_location_taxonomy');
+//add_action('init', 'base_register_location_taxonomy');
+
+/**
+ * Add mediatheque hiérarchical taxonomy for attachments
+ */
+// register new taxonomy which applies to attachments
+function base_register_add_mediatheque_taxonomy() {
+    $labels = array(
+        'name'              => 'Catégorie',
+        'singular_name'     => 'Catégorie',
+        'search_items'      => 'Rechercher dans les catégories',
+        'all_items'         => 'Toutes les catégories',
+        'parent_item'       => 'Catégorie parente',
+        'parent_item_colon' => 'Catégorie parente :',
+        'edit_item'         => 'Editer la catégorie',
+        'update_item'       => 'Mettre à jour la catégorie',
+        'add_new_item'      => 'Ajouter une nouvelle catégorie',
+        'new_item_name'     => 'Nom de la nouvelle catégorie',
+        'menu_name'         => 'Catégories',
+    );
+
+    $args = array(
+        'labels' => $labels,
+        'hierarchical' => true,
+        'query_var' => 'true',
+        'rewrite' => 'true',
+        'show_admin_column' => 'true',
+    );
+
+    register_taxonomy( 'collection', 'attachment', $args );
+    add_post_type_support('attachment', 'collection');
+}
+add_action( 'init', 'base_register_add_mediatheque_taxonomy' );
