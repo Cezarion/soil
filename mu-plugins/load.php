@@ -17,6 +17,8 @@ require WPMU_PLUGIN_DIR . '/wp-post-formats/cf-post-formats.php';
 require WPMU_PLUGIN_DIR . '/regenerate-thumbnails/regenerate-thumbnails.php';
 require WPMU_PLUGIN_DIR . '/enable-media-replace/enable-media-replace.php';
 
+//Backup and db tools
+require WPMU_PLUGIN_DIR . '/wp-migrate-db/wp-migrate-db.php';
 
 // Site specific custom post types, taxonomies, meta boxes and shortcodes
 require WPMU_PLUGIN_DIR . '/base/base.php';
