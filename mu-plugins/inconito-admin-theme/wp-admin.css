@@ -1,0 +1,92 @@
+/*
+    Document   : wp-admin.css
+    Created on : 15 mai 2012, 16:43:26
+    Author     : Mathias Gorenflot - © Inconito.fr
+    Description:
+        Adjustement for wordpress admin themes and plugins
+*/
+
+.pull-left { float: left;}
+.pull-left + .pull-left { margin-left: 20px; }
+.clearfix { clear: both; }
+
+/**********************************/
+/* POST TO POST                          */
+/**********************************/
+
+.p2p-col-meta-direction label {padding-right: 5px;}
+.p2p-col-meta-direction input[type="radio"]
+{
+        width: auto;
+}
+.p2p-col-meta-ordre input {
+        border: 1px solid #CCCCCC;
+        background-color: #FFFFFF;
+        width: 20px !important;
+        text-align: center;
+}
+/**********************************/
+/* SHORTCODE SELECT BOX       */
+/**********************************/
+#sc_select {
+        position: absolute;
+}
+
+/**********************************/
+/* CUSTOM FIELDS TAXONOMY  */
+/**********************************/
+
+.custom-field-saison td label
+{
+        display: block;
+        float: left;
+        margin-right: 15px;
+}
+.custom-field-saison td label input[type="radio"]
+{
+        width: 15px;
+        float: left;
+
+}
+
+
+/**********************************/
+/* Field Manager                          */
+/**********************************/
+.fm-wrapper
+{
+  margin-bottom: 10px;
+}
+
+.fm-wrapper   .input-paste input
+{
+    text-align: center;
+}
+
+.fm-label-inline
+{
+    min-width: 110px;
+    display: inline-block;
+}
+
+/**********************************/
+/* CMB                                            */
+/**********************************/
+
+table.cmb_metabox th {
+        text-align: left;
+}
+
+.wpabox select.colors option:first-child
+{
+      font-size: 10px;
+      color: #CCC;
+}
+
+#wpcontent select.colors option
+{
+      background-repeat: no-repeat;
+      background-position: 2px 2px;
+      text-indent: 12px;
+      padding: 2px 1px;
+}

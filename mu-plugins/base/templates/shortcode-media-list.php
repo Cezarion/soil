@@ -39,7 +39,7 @@ if( $dropdown )
 {
     $dropdown_args = array
     (
-      'show_option_all' => ( $show_all ) ? __( $taxonomy , 'Roots') :  __('All', 'Roots'),
+      'show_option_all' => ( $show_all ) ? __( $taxonomy , 'Roots') :  __('Voir tout', 'Roots'),
       'taxonomy'          => $taxonomy,
       'hide_empty'        => false
     );
@@ -77,6 +77,19 @@ if( $dropdown )
  ******************************************* */
 $medias_args['tax_query'] [] = $tax_args;
 $medias_query = new WP_Query($medias_args);
+
+
+
+/*
+ * Responsive Image size
+ ******************************************* */
+global $_wp_additional_image_sizes; //get registered image size
+$get_image_size = 'mediatheque-thumb-'.ioo_get_var('size-suffix');
+
+if ( array_key_exists( 'mediatheque-thumb-'.ioo_get_var('size-suffix') , $_wp_additional_image_sizes) )
+  $image_size = $get_image_size;
+else
+  $image_size = 'mediatheque-thumb-desktop';
 ?>
 
 
@@ -90,12 +103,16 @@ $medias_query = new WP_Query($medias_args);
   </form>
   <?php endif; ?>
 
-  <div class="media media-collection media-collection-<?=$category?>">
+  <div class="row media-collection media-collection-<?=$category?>">
     <?php while ($medias_query->have_posts()) : $medias_query->the_post(); ?>
 
       <?php
       $post_terms = get_the_terms( get_the_ID() , "collection" );
+      $the_content = '';
 
+      //
+      // Set css class
+      //
       if( $post_terms && ! is_wp_error( $post_terms ) )
       {
         $media_class = array('media-item');
@@ -104,16 +121,56 @@ $medias_query = new WP_Query($medias_args);
         {
           $media_class[] ="media-item-".$post_term->slug;
           $sprite_class[] ="sprite-media-".$post_term->slug;
+          $content_type = $post_term->slug;
         }
+      }
+
+      //
+      // Légende
+      //
+      $the_excerpt  =  get_the_excerpt();
+
+      //
+      // Images attributes
+      //
+      $img_thumb = wp_get_attachment_image_src( get_the_ID() , $image_size );
+      $img_attr      = array
+                              (
+                                  'alt'   => trim(strip_tags( get_post_meta($attachment_id, '_wp_attachment_image_alt', true) )), // Use Alt field first
+                                  'title' =>  trim(strip_tags( get_the_title() ) )
+                              );
+
+      if ( empty($img_attr['alt']) )
+        $img_attr['alt'] = trim(strip_tags( get_the_excerpt() )); // If not, Use the Caption
+      if ( empty($img_attr['alt']) )
+        $img_attr['alt'] = $img_attr['title'] ; // Finally, use the title
+
+      $format = '<img src="%s" class="%s" alt="%s" title="%s"/>';
+
+      switch ( $content_type )
+      {
+        case 'videos':
+            $the_content = get_the_content();
+            $the_content = do_shortcode( $the_content );# code...
+          break;
+
+        default:
+            $img_wide = wp_get_attachment_image_src( get_the_ID() , 'mediatheque-wide' );
+            $the_content  =  sprintf( $format , $img_wide[0] , 'media-item-wide' , $img_attr['alt'] , $img_attr['title']);
+          break;
       }
       ?>
 
       <a <?php add_class('media-link span2'); ?> title="<?php the_title_attribute(); ?>">
         <figure <?php add_class($media_class); ?>>
-          <?php echo wp_get_attachment_image( get_the_ID(), 'mediatheque-thumb' ,'', array ( 'class' => 'media-item' ) ); ?>
-          <!-- <figcaption class="media-caption"><?php the_title(); ?></figcaption> -->
+          <?php printf( $format , $img_thumb[0] , 'media-item' , $img_attr['alt'] , $img_attr['title']); ?>
             <script type="text/html" class="media-script">
-                    <?php echo the_content(); ?>
+                    <?php echo $the_content.PHP_EOL; ?>
+            <?php if ( !empty( $the_excerpt ) ) :  ?>
+                  <div class="media-caption">
+                      <?php echo $the_excerpt ?>
+                  </div>
+            <?php endif; ?>
             </script>
            <span class="overlay"></span>
             <i <?php add_class( $sprite_class ); ?>></i>
@@ -130,12 +187,7 @@ $medias_query = new WP_Query($medias_args);
 <div id="mediatheque-modal" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>Modal header</h3>
   </div>
-  <div class="modal-body">
-    <p>
-      One fine body…
-    </p>
-  </div>
+  <div class="modal-body"></div>
 </div>
 <?php wp_reset_postdata(); ?>

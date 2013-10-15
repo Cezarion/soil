@@ -46,6 +46,45 @@ function base_register_rotator_post_type() {
 //add_action('init', 'base_register_rotator_post_type');
 
 /**
+ * Advertise custom post type
+ */
+function base_register_advertise_post_type() {
+  $labels = array(
+    'name'               => 'Advertise Items',
+    'singular_name'      => 'Advertise Item',
+    'add_new'            => 'Add New',
+    'add_new_item'       => 'Add New Advertise Item',
+    'edit_item'          => 'Edit Advertise Item',
+    'new_item'           => 'New Advertise Item',
+    'view_item'          => 'View Advertise Item',
+    'search_items'       => 'Search Advertise Items',
+    'not_found'          => 'No advertise items found',
+    'not_found_in_trash' => 'No advertise items found in trash',
+    'parent_item_colon'  => '',
+    'menu_name'          => 'Publicité'
+  );
+
+  $args = array(
+    'labels'              => $labels,
+    'public'              => true,
+    'exclude_from_search' => true,
+    'publicly_queryable'  => true,
+    'show_ui'             => true,
+    'show_in_menu'        => true,
+    'query_var'           => true,
+    'rewrite'             => array('slug' => 'advertise'),
+    'capability_type'     => 'post',
+    'has_archive'         => false,
+    'hierarchical'        => false,
+    'menu_position'       => null,
+    'supports'            => array('title', 'custom-fields')
+  );
+
+  register_post_type('base_advertise', $args);
+}
+add_action('init', 'base_register_advertise_post_type');
+
+/**
  * Rotator Location taxonomy
  */
 function base_register_location_taxonomy() {

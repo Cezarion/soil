@@ -9,6 +9,6 @@ require_once(dirname(__FILE__) . '/lib/post-types.php');
 require_once(dirname(__FILE__) . '/lib/widgets.php');
 require_once(dirname(__FILE__) . '/lib/shortcodes.php');
 require_once(dirname(__FILE__) . '/lib/social.connect.php');
+require_once(dirname(__FILE__) . '/lib/meta-boxes.php');
 
 //Not Use
-// require_once(dirname(__FILE__) . '/lib/meta-boxes.php');

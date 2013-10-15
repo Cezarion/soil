@@ -16,6 +16,70 @@ function printr( $array ){
 }
 
 /**
+ * Get post meta with identified prefix
+ * @param  $post_id post_id
+ * @param  $prefix meta_key prefix
+ * @return a data object with all the post_meta identified by the prefix
+ */
+
+function get_post_meta_with_prefix($post_id, $prefix=NULL){
+    global $wpdb;
+        $query_prefix  = ($prefix !== NULL) ?  " AND `meta_key` LIKE '".$prefix."%'" : '';
+
+    $data   =   array();
+    $wpdb->query("
+        SELECT `meta_key`, `meta_value`
+        FROM $wpdb->postmeta
+        WHERE `post_id` = $post_id
+        $query_prefix
+    ");
+
+    foreach($wpdb->last_result as $k => $v)
+		$data[$v->meta_key] =   maybe_unserialize($v->meta_value);
+
+    $data = (object) $data;
+
+    return $data;
+}
+
+/**
+ *
+ */
+if( !function_exists('post_exists_id'))
+{
+	function post_exists_id($post_id)
+	{
+		global $wpdb;
+
+		$post_id = wp_unslash( sanitize_post_field( 'ID', $post_id, 0, 'db' ) );
+
+		$query = "SELECT ID FROM $wpdb->posts WHERE 1=1";
+		$query .= ' AND ID = %s';
+		$args[] = $post_id;
+
+		if ( !empty ( $args ) )
+			return (int) $wpdb->get_var( $wpdb->prepare($query, $args) );
+
+		return FALSE;
+	}
+}
+
+
+/**
+ * Get desired path info from wp_upload_dir()
+ * @param  key (possible value : path , url , subdir , basedir , baseurl )
+ * @return  value
+ */
+if( !function_exists( 'get_upload_dir' ) )
+{
+	function get_upload_dir( $key = 'baseurl' , $time = null )
+	{
+		$path = wp_upload_dir( $time );
+		return $path[$key];
+	}
+}
+
+/**
  * Create pagination for custom query
  * @param  object $wpQuery the wp_query
  * @return  wp html formated pagination
@@ -106,4 +170,135 @@ if( !function_exists( 'theme_pagination' ) ) {
 
 	echo str_replace('page/1/','', paginate_links( $pagination ) );
     }
+}
+
+/**
+ * Check an utube url and force it to display in html5
+ * @param  $utube url
+ * @return  $utube url vith html5 param
+ */
+
+function uTube_video_iframe( $url )
+{
+	return preg_replace_callback('#(?:https?://\S+)|(?:www.\S+)|(?:\S+\.\S+)#', function($arr)
+	{
+	    $url = parse_url($arr[0]);
+	    // youtube
+	    if( in_array($url['host'], array('www.youtube.com', 'youtube.com')) )
+	    {
+	    	  unset($url['scheme']);
+	        if ( !isset($url['query'] ) )
+	        {
+	            $url['query'] = 'wmode=opaque&html5=1';
+	        }
+	        else
+	        {
+	            if( strstr($url['query'] , 'v=' )  == 0 )
+	            {
+	                $url['query'] = substr( $url['query'] , 2 );
+	            }
+
+	            if( strpos( strtolower ( $url['query'] ) , 'html5=true') == 0 )
+	            {
+	                $url['query'] = $url['query'].'/?html5=1';
+	            }
+	        }
+	        if( $url['path'] == '/watch' )
+	        {
+	            $url['path'] = 'embed';
+	        }
+
+	      return  vsprintf('//%s/%s/%s' , $url );
+	    }
+	    else
+	    {
+	        return false;
+	    }
+
+	}, $url );
+}
+
+/**
+ * Create page breadcrumb
+ * @param  none
+ * @return  utml formated breadcrumb
+ */
+
+function the_breadcrumb( $wrapper_class = 'breadcrumb' , $separator = "/" )
+{
+	//sprintf params
+	$archive		= 	_x('Archive for' , 'Base');
+	$li 				= 	'		<li class="'.$wrapper_class.'-item">%s</li>'.PHP_EOL;
+	$li_arhive 		= 	'		<li class="'.$wrapper_class.'-item">%s : %s</li>'.PHP_EOL.'%s';
+	$li_link 		= 	'		<li class="'.$wrapper_class.'-item"><a href="%1$s" title="%2s">%2$s</a></li>%3$s';
+	$li_sep  		= 	PHP_EOL.'		<li class="'.$wrapper_class.'-separator">'.$separator.'</li>'.PHP_EOL;
+
+	global $post;
+
+	echo '<ul class="inline '.$wrapper_class.'">'.PHP_EOL;
+	if ( !is_home() )
+	{
+		printf( $li_link , get_option('home') , _x('Home' , 'Roots') , $li_sep);
+
+		if (is_category() || is_single())
+		{
+			echo '		<li>';
+			the_category('</li>'.$li_sep.'		<li> ');
+			if (is_single())
+			{
+				echo '</li>'.$li_sep;
+				printf( $li , the_title() );
+			}
+		}
+		elseif (is_page())
+		{
+			if($post->post_parent)
+			{
+				$anc = get_post_ancestors( $post->ID );
+
+				foreach ( $anc as $ancestor )
+				{
+					$output = sprintf( $li_link , get_permalink($ancestor) , get_the_title($ancestor) , $li_sep );
+				}
+				echo $output;
+				echo '<span class="'.$wrapper_class.'-current" title="'.get_the_title().'"> '.get_the_title().'</span>';
+			}
+			else
+			{
+				echo '<span class="'.$wrapper_class.'-current" title="'.get_the_title().'"> '.get_the_title().'</span>';
+			}
+		}
+	}
+	elseif (is_tag())
+	{
+		single_tag_title();
+	}
+	elseif (is_day())
+	{
+		$time = the_time('F jS, Y');
+		printf( $li_arhive , $txt , $time );
+	}
+	elseif (is_month())
+	{
+		$the_time('F, Y');
+		printf( $li_arhive , $txt , $time );
+	}
+	elseif (is_year())
+	{
+		$the_time('Y');
+		printf( $li_arhive , $txt , $time );
+	}
+	elseif (is_author())
+	{
+		printf( $li , _x( 'Author Archive' , 'Base' ) );
+	}
+	elseif (isset($_GET['paged']) && !empty($_GET['paged']))
+	{
+		printf( $li , _x( 'Blog Archives' , 'Base' ) );
+	}
+	elseif (is_search())
+	{
+		printf( $li , _x( 'Search Results' , 'Base' ) );
+	}
+	echo '</ul>';
 }

@@ -178,7 +178,7 @@ class TwitterConnect
 ?>
         <div class="twitter-wrapper media"<?=$id.$width?>>
              <div class="twitter-logo pull-left">
-                  <a href="htts://twitter.com/" target="_blank"><i class="sprite sprite-icon-twtr"></i></a>
+                  <a href="https://twitter.com/<?php echo $uname; ?>" target="_blank"><i class="sprite sprite-icon-twtr"></i></a>
               </div>
             <div class="twitter-container media-body">
                 <?php if( $show_account ) : ?>
